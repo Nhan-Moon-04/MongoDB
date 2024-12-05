@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-3">
+        <!-- Login Section -->
+        <div id="login-section" class="mb-3 text-end">
+            <label for="username" class="me-2">Username:</label>
+            <input type="text" id="username" class="me-2">
+            <label for="password" class="me-2">Password:</label>
+            <input type="password" id="password" class="me-2">
+            <button id="login-btn" class="btn btn-primary btn-sm">Login</button>
+        </div>
+
+        <!-- Logout Section -->
+        <div id="logout-section" class="mb-3 text-end d-none">
+            <span id="welcome-msg" class="me-3"></span>
+            <button id="logout-btn" class="btn btn-danger btn-sm">Logout</button>
+        </div>
+
+        <!-- Add Product Form -->
+        <div id="add-product-form" class="d-none">
+            <h3>Add Product</h3>
+            <form id="productForm" class="mb-3">
+                <div class="mb-2">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" id="name" class="form-control" required>
+                </div>
+                <div class="mb-2">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" id="description" class="form-control" required>
+                </div>
+                <div class="mb-2">
+                    <label for="price" class="form-label">Price</label>
+                    <input type="number" id="price" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-success">Add Product</button>
+            </form>
+        </div>
+
+        <!-- Product List -->
+        <h3>Product List</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th class="admin-actions d-none">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="product-list"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const welcomeMsg = document.getElementById('welcome-msg');
+        const loginSection = document.getElementById('login-section');
+        const logoutSection = document.getElementById('logout-section');
+        const addProductForm = document.getElementById('add-product-form');
+        const productForm = document.getElementById('productForm');
+        const productList = document.getElementById('product-list');
+
+        let isAdmin = false;
+
+        // Handle login
+        loginBtn.addEventListener('click', () => {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            if (username === 'ad' && password === '123') {
+                isAdmin = true;
+                welcomeMsg.textContent = `Welcome, ${username}`;
+                loginSection.classList.add('d-none');
+                logoutSection.classList.remove('d-none');
+                addProductForm.classList.remove('d-none');
+                document.querySelectorAll('.admin-actions').forEach(el => el.classList.remove('d-none'));
+                fetchProducts();
+            } else {
+                alert('Invalid username or password!');
+            }
+        });
+
+        // Handle logout
+        logoutBtn.addEventListener('click', () => {
+            isAdmin = false;
+            welcomeMsg.textContent = '';
+            loginSection.classList.remove('d-none');
+            logoutSection.classList.add('d-none');
+            addProductForm.classList.add('d-none');
+            document.querySelectorAll('.admin-actions').forEach(el => el.classList.add('d-none'));
+        });
+
+        // Handle adding product
+        productForm.addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+            const price = document.getElementById('price').value;
+
+            await fetch('/add-product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name,
+                    description,
+                    price
+                })
+            });
+
+            alert('Product added successfully!');
+            fetchProducts();
+        });
+
+        // Fetch and render products
+        async function fetchProducts() {
+            const response = await fetch('/products');
+            const products = await response.json();
+
+            productList.innerHTML = '';
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.description}</td>
+                    <td>${product.price}</td>
+                    <td class="admin-actions d-none">
+                        <button class="btn btn-warning btn-sm me-2" onclick="editProduct('${product._id}')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product._id}')">Delete</button>
+                    </td>
+                `;
+                if (isAdmin) {
+                    row.querySelector('.admin-actions').classList.remove('d-none');
+                }
+                productList.appendChild(row);
+            });
+        }
+
+        // Edit product
+        function editProduct(id) {
+            const newName = prompt('Enter new name:');
+            const newDescription = prompt('Enter new description:');
+            const newPrice = prompt('Enter new price:');
+            fetch(`/edit-product/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: newName,
+                    description: newDescription,
+                    price: newPrice
+                })
+            }).then(() => fetchProducts());
+        }
+
+        // Delete product
+        function deleteProduct(id) {
+            fetch(`/delete-product/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(() => fetchProducts());
+        }
+
+        // Fetch products on page load
+        fetchProducts();
+    </script>
+</body>
+
+</html>
