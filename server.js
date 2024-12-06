@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const path = require('path'); // Đảm bảo đã import path module
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -63,7 +63,8 @@ app.delete('/delete-product/:id', (req, res) => {
         .catch(err => res.status(400).send('Error deleting product: ' + err));
 });
 
-// Serve Frontend (index.html)
+
+// Serve Frontend
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
