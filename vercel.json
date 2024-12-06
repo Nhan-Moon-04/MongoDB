@@ -1,7 +1,7 @@
 {
     "version": 2,
     "builds": [{
-        "src": "./index.js",
+        "src": "index.js",
         "use": "@vercel/node"
     }],
     "routes": [{
@@ -9,6 +9,6 @@
         "dest": "/index.js"
     }],
     "env": {
-        "MONGO_URI": "mongodb+srv://nthiennhan1611:JljppFjp36YZKEL9@cluster0.z0zjg.mongodb.net/Cluster0?retryWrites=true&w=majority"
+        "MONGO_URI": "mongodb+srv://nthiennhan1611:nguyenthiennhan@cluster0.z0zjg.mongodb.net/Cluster0?retryWrites=true&w=majority"
     }
 }
