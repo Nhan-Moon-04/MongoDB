@@ -109,6 +109,11 @@
             const description = document.getElementById('description').value;
             const price = document.getElementById('price').value;
 
+            if (!name || !description || !price) {
+                alert('All fields are required!');
+                return;
+            }
+
             await fetch('/add-product', {
                 method: 'POST',
                 headers: {
@@ -123,6 +128,11 @@
 
             alert('Product added successfully!');
             fetchProducts();
+
+            // Clear form
+            document.getElementById('name').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('price').value = '';
         });
 
         // Fetch and render products
