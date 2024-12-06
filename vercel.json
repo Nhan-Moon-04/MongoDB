@@ -1,12 +1,12 @@
 {
     "version": 2,
     "builds": [{
-        "src": "server.js",
+        "src": "index.js",
         "use": "@vercel/node"
     }],
     "routes": [{
         "src": "/(.*)",
-        "dest": "/server.js"
+        "dest": "/index.js"
     }],
     "env": {
         "MONGO_URI": "mongodb+srv://nthiennhan1611:6LBzqKs1MiPDyxKs.@cluster0.z0zjg.mongodb.net/myDatabase?retryWrites=true&w=majority&appName=Cluster0"
