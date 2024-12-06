@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const path = require('path');
+const path = require('path'); // Đảm bảo đã import path module
 
 const app = express();
 const port = 3000;
@@ -11,9 +11,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB Connection
-const uri = process.env.MONGO_URI; // Lấy URL kết nối MongoDB từ biến môi trường
+const uri = process.env.MONGO_URI || 'mongodb+srv://nthiennhan1611:XLMRXRXPVXbiB8Qm@cluster0.z0zjg.mongodb.net/myDatabase?retryWrites=true&w=majority';
 
-// Kết nối tới MongoDB
 mongoose.connect(uri)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Error connecting to MongoDB:', err));
@@ -64,7 +63,7 @@ app.delete('/delete-product/:id', (req, res) => {
         .catch(err => res.status(400).send('Error deleting product: ' + err));
 });
 
-// Serve Frontend
+// Serve Frontend (index.html)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
