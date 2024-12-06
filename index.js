@@ -47,12 +47,13 @@ app.get('/products', (req, res) => {
 // Update product
 app.put('/update-product/:id', (req, res) => {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, price } = req.body;
 
-    Product.findByIdAndUpdate(id, { name, description }, { new: true })
-        .then(() => res.send('Product updated successfully'))
-        .catch(err => res.status(400).send('Error updating product: ' + err));
+    Product.findByIdAndUpdate(id, { name, description, price }, { new: true })
+        .then(updatedProduct => res.status(200).json(updatedProduct))
+        .catch(err => res.status(400).json({ error: err.message }));
 });
+
 
 // Delete product
 app.delete('/delete-product/:id', (req, res) => {

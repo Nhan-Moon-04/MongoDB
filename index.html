@@ -136,22 +136,23 @@
         });
 
         // Fetch and render products
+        // Fetch and render products
         async function fetchProducts() {
             const response = await fetch('/products');
             const products = await response.json();
 
-            productList.innerHTML = '';
+            productList.innerHTML = ''; // Clear existing list
             products.forEach(product => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>${product.description}</td>
-                    <td>${product.price}</td>
-                    <td class="admin-actions d-none">
-                        <button class="btn btn-warning btn-sm me-2" onclick="editProduct('${product._id}')">Edit</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product._id}')">Delete</button>
-                    </td>
-                `;
+            <td>${product.name}</td>
+            <td>${product.description}</td>
+            <td>${product.price}</td>
+            <td class="admin-actions d-none">
+                <button class="btn btn-warning btn-sm me-2" onclick="editProduct('${product._id}')">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product._id}')">Delete</button>
+            </td>
+        `;
                 if (isAdmin) {
                     row.querySelector('.admin-actions').classList.remove('d-none');
                 }
@@ -159,23 +160,39 @@
             });
         }
 
+
+        // Edit product
         // Edit product
         function editProduct(id) {
             const newName = prompt('Enter new name:');
             const newDescription = prompt('Enter new description:');
             const newPrice = prompt('Enter new price:');
-            fetch(`/edit-product/${id}`, {
+
+            if (!newName || !newDescription || !newPrice) {
+                alert('All fields are required!');
+                return;
+            }
+
+            fetch(`/update-product/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     name: newName,
                     description: newDescription,
                     price: newPrice
                 })
-            }).then(() => fetchProducts());
+            }).then(response => {
+                if (response.ok) {
+                    alert('Product updated successfully!');
+                    fetchProducts(); // Re-fetch product list to show updated data
+                } else {
+                    alert('Error updating product!');
+                }
+            });
         }
+
 
         // Delete product
         function deleteProduct(id) {
